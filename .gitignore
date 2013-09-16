@@ -11,3 +11,9 @@
 *.lai
 *.la
 *.a
+
+main
+games
+*.pro.user
+game
+Makefile
