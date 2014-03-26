@@ -137,7 +137,7 @@ int main()
 	ifstream in("game");
 	string currgame;
 	getline(in, currgame);
-	for(int i = 0; i < games.size(); i++)
+	for(int i = 0; i < (int)games.size(); i++)
 		if(games[i].name == currgame)
 		{
 			t = i;
@@ -169,10 +169,10 @@ int main()
 				destt--;
 
 			if(destt < 0) destt = 0;
-			if(destt >= games.size()) destt = games.size()-1;
+			if(destt >= (int)games.size()) destt = games.size()-1;
 
-			if(event.type == Event::KeyPressed &&
-					(event.key.code == Keyboard::Return) || (event.key.code == Keyboard::Space))
+			if((event.type == Event::KeyPressed && (event.key.code == Keyboard::Return))
+				 || (event.key.code == Keyboard::Space))
 			{
 				ofstream out("game");
 				out << games[destt].name;
@@ -204,8 +204,8 @@ int main()
 			shader->setParameter("time", allTime);
 			shader->setParameter("color", rr, gg, bb);
 			glBegin(GL_QUADS);
-			float aspectRatio = (float)myapp->getSize().x / (float)myapp->getSize().y;
-			/*glTexCoord2f(-aspectRatio, -1); glVertex2f(-1, -1);
+			/*float aspectRatio = (float)myapp->getSize().x / (float)myapp->getSize().y;
+			glTexCoord2f(-aspectRatio, -1); glVertex2f(-1, -1);
 			glTexCoord2f(aspectRatio, -1); glVertex2f(1, -1);
 			glTexCoord2f(aspectRatio, 1); glVertex2f(1, 1);
 			glTexCoord2f(-aspectRatio, 1); glVertex2f(-1, 1);*/
@@ -218,7 +218,7 @@ int main()
 
 		Shader::bind(NULL);
 
-		for(int i = 0; i < games.size(); i++)
+		for(int i = 0; i < (int)games.size(); i++)
 			games[i].render(i-t);
 
 

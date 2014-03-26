@@ -14,6 +14,5 @@
 
 main
 games
-*.pro.user
 game
-Makefile
+*~
