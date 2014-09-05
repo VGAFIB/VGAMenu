@@ -1,0 +1,1 @@
+float* calcSdf(const unsigned char* px);

@@ -12,6 +12,7 @@
 *.la
 *.a
 
+build/
 main
 games
 game

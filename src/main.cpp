@@ -4,11 +4,14 @@
 #include <vector>
 #include <cstdlib>
 #include <cstdio>
+#include <queue>
 #include <dirent.h>
 #include <iostream>
 #include <fstream>
 #include <cmath>
 #include <GL/gl.h>
+
+#include "sdf.h"
 
 const int SCRWIDTH  = 1920;
 const int SCRHEIGHT = 1080;
@@ -108,17 +111,48 @@ void loadGames()
 	}
 }
 
+// Returns texture id
+GLuint makeDistanceField()
+{
+	Image img;
+	img.loadFromFile("data/outline.png");
+	const int size = 4096;
+	const unsigned char* px = img.getPixelsPtr();
+
+	float* dist = calcSdf(px);
+
+	GLuint tex;
+
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, size, size, 0, GL_RED, GL_FLOAT, dist);
+
+	delete dist;
+
+	return tex;
+}
 
 int main()
 {
+	cout<<"Loading games..."<<endl;
 	loadGames();
 
+	cout<<"Creating window..."<<endl;
 	RenderWindow app(VideoMode(SCRWIDTH, SCRHEIGHT, 32), "Week1", Style::None);
 	myapp = &app;
 
-	if (!font.loadFromFile("BitDarling.ttf"))
+	cout<<"Loading font..."<<endl;
+	if (!font.loadFromFile("data/BitDarling.ttf"))
 		cout<<"Can't load font!";
 
+	cout<<"Rendering distfield..."<<endl;
+	GLuint distfield = makeDistanceField();
+
+	cout<<"Loading shader..."<<endl;
 	Shader* shader = new Shader();
 	shader->loadFromFile("shaders/vertex.glsl", "shaders/fragment.glsl");
 
@@ -126,6 +160,7 @@ int main()
 	int destt = 0;
 	float allTime = 0;
 
+	cout<<"Reading current game..."<<endl;
 	ifstream in("game");
 	string currgame;
 	getline(in, currgame);
@@ -141,6 +176,7 @@ int main()
 	float gg = games[0].g;
 	float bb = games[0].b;
 
+	cout<<"Running..."<<endl;
 	Clock clock;
 	while(app.isOpen())
 	{
@@ -192,9 +228,11 @@ int main()
 
 		if(true)
 		{
+			glBindTexture(GL_TEXTURE_2D, distfield);
 			Shader::bind(shader);
 			shader->setParameter("time", allTime);
 			shader->setParameter("color", rr, gg, bb);
+			shader->setParameter("resolution", app.getSize().x, app.getSize().y);
 			glBegin(GL_QUADS);
 			/*float aspectRatio = (float)myapp->getSize().x / (float)myapp->getSize().y;
 			glTexCoord2f(-aspectRatio, -1); glVertex2f(-1, -1);
