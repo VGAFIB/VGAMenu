@@ -41,10 +41,13 @@ class Game
 
 			string line;
 			getline(in, line);
-			getline(in, line);
 
-			while(getline(in, line))
+			while(getline(in, line)) {
+				//Ignorar lineas vacias al principio
+				if(description == "" && line == "")
+					continue;
 				description += line+"\n";
+			}
 
 			if(!t.loadFromFile("./games/"+name+"/game.png"))
 				cout<<"Cant load image for game "+name<<endl;
