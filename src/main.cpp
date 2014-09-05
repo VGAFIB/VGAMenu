@@ -216,7 +216,7 @@ int main()
 		Time time = clock.restart();
 		float deltaTime = time.asSeconds();
 
-		allTime += deltaTime;
+		allTime += deltaTime * (1+abs(t-destt)*10);
 
 		float mix = exp(-deltaTime*10);
 		t = t*mix + destt*(1-mix);
