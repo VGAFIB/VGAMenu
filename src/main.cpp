@@ -164,7 +164,7 @@ int main()
 	float allTime = 0;
 
 	cout<<"Reading current game..."<<endl;
-	ifstream in("game");
+	ifstream in("oldgame");
 	string currgame;
 	getline(in, currgame);
 	for(int i = 0; i < (int)games.size(); i++)
@@ -175,9 +175,9 @@ int main()
 		}
 
 
-	float rr = games[0].r;
-	float gg = games[0].g;
-	float bb = games[0].b;
+	float rr = games[destt].r;
+	float gg = games[destt].g;
+	float bb = games[destt].b;
 
 	cout<<"Running..."<<endl;
 	Clock clock;
