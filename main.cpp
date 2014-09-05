@@ -36,23 +36,15 @@ class Game
 			getline(in, title);
 			in>>r>>g>>b;
 
-			string shit;
-			getline(in, shit);
-			getline(in, shit);
+			string line;
+			getline(in, line);
+			getline(in, line);
 
-			while(getline(in, shit))
-				description += shit+"\n";
+			while(getline(in, line))
+				description += line+"\n";
 
 			if(!t.loadFromFile("./games/"+name+"/game.png"))
 				cout<<"Cant load image for game "+name<<endl;
-
-			/*
-			cout<<"============"<<endl;
-			cout<<g.name<<endl;
-			cout<<g.title<<endl;
-			cout<<"LOL"<<endl;
-			cout<<g.description<<endl;
-			*/
 		}
 
 		void render(float p)
