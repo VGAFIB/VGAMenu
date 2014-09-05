@@ -34,7 +34,7 @@ INC_PATH = headers
 # General compiler flags
 COMPILE_FLAGS = -std=c++11 -Wall -Wextra -g
 # Additional release-specific flags
-RCOMPILE_FLAGS = -D NDEBUG
+RCOMPILE_FLAGS = -D NDEBUG -O3
 # Additional debug-specific flags
 DCOMPILE_FLAGS = -D DEBUG
 # Add additional include paths
@@ -42,7 +42,7 @@ INCLUDES = -I $(INC_PATH)/
 # General linker settings
 LINK_FLAGS = -lsfml-system -lsfml-graphics -lsfml-window -lsfml-audio -lGL
 # Additional release-specific linker settings
-RLINK_FLAGS = 
+RLINK_FLAGS = -O3
 # Additional debug-specific linker settings
 DLINK_FLAGS = 
 # Destination directory, like a jail or mounted system
