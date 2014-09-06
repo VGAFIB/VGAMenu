@@ -2,7 +2,7 @@
 #include <math.h>
 
 #define WIDTH  4096
-#define HEIGHT 4096
+#define HEIGHT 1024
 
 struct Point
 {

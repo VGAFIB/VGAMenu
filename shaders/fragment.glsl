@@ -13,12 +13,14 @@ uniform vec2 resolution;
 uniform sampler2D tex;
 uniform vec3 color;
 
-#define DELTA           0.01
-#define NORMAL_DELTA     0.05
+#define USE_AA
+
+#define DELTA           0.02
+#define NORMAL_DELTA     0.08
 #define RAY_COUNT       7
-#define RAY_LENGTH_MAX      40.0
+#define RAY_LENGTH_MAX      30.0
 #define RAY_STEP_MAX        100
-#define LIGHT           vec3 (1.0, 1.0, -1.0)
+#define LIGHT           vec3 (1.0, 1.0, 1.0)
 #define REFRACT_FACTOR      0.6
 #define REFRACT_INDEX       1.4
 #define AMBIENT         0.2
@@ -48,11 +50,14 @@ mat3 mRotate (in vec3 angle) {
 float getDistance (in vec3 pq) {
     float scale = 0.06;
     vec3 p = pq*scale;
-    vec4 lol = texture2D(tex, p.xy+0.5);
 
-    vec3 ap = abs(p)-0.5;
-    float extra = max(max(0, ap.x), max(ap.y, ap.z));
-    return max(lol.r/scale+extra, abs(pq.z)-1.0);
+    vec3 ap = abs(p)-vec3(0.5, 0.125, 0.1);
+    float extra = max(ap.x, max(ap.y, ap.z));
+    if(extra > 0)
+        return extra/scale + 0.50;
+
+    vec4 lol = texture2D(tex, vec2(p.x, p.y*4)+0.5);
+    return max(lol.r/scale, abs(pq.z)-0.8);
 }
 
 vec3 getFragmentColor (in vec3 origin, in vec3 direction) {
@@ -82,7 +87,7 @@ vec3 getFragmentColor (in vec3 origin, in vec3 direction) {
         }
 
         // Check whether we hit something
-        vec3 backColor = color * (0.1 + 0.2 * max (0.0, dot (-direction, lightDirection)));
+        vec3 backColor = color * (0.1 + 0.2 * max (0.0, dot (direction, lightDirection)));
         if (dist >= 0.0) {
             fragColor = fragColor * (1.0 - intensity) + backColor * intensity;
             break;
@@ -126,10 +131,10 @@ vec3 getFragmentColor (in vec3 origin, in vec3 direction) {
     return fragColor * LUMINOSITY_FACTOR + GLOW_FACTOR * rayStepCount / float (RAY_STEP_MAX * RAY_COUNT);
 }
 
-void main () {
-
+vec4 getPixelColor (in vec2 coord)
+{
     // Define the ray corresponding to this fragment
-    vec2 frag = (2.0 * gl_FragCoord.xy - resolution.xy) / resolution.y;
+    vec2 frag = (2.0 * coord - resolution.xy) / resolution.y;
     vec3 direction = normalize (vec3 (frag, 2.0));
 
     // Set the camera
@@ -153,5 +158,19 @@ void main () {
     direction = rotation * direction;
 
     // Set the fragment color
-    gl_FragColor = vec4 (getFragmentColor (origin, direction), 1.0);
+    return vec4 (getFragmentColor (origin, direction), 1.0);
+}
+
+void main () {
+
+#ifdef USE_AA
+    gl_FragColor = (
+        getPixelColor(gl_FragCoord + vec2(0.0, 0.0)) +
+        getPixelColor(gl_FragCoord + vec2(0.5, 0.0)) +
+        getPixelColor(gl_FragCoord + vec2(0.0, 0.5)) +
+        getPixelColor(gl_FragCoord + vec2(0.5, 0.5))) * 0.25;
+#else
+    gl_FragColor = (
+        getPixelColor(gl_FragCoord + vec2(0.0, 0.0)));
+#endif
 }
