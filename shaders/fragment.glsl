@@ -53,10 +53,10 @@ float getDistance (in vec3 pq) {
 
     vec3 ap = abs(p)-vec3(0.5, 0.125, 0.1);
     float extra = max(ap.x, max(ap.y, ap.z));
-    if(extra > 0)
+    if(extra > 0.0)
         return extra/scale + 0.50;
 
-    vec4 lol = texture2D(tex, vec2(p.x, p.y*4)+0.5);
+    vec4 lol = texture2D(tex, vec2(p.x, p.y*4.0)+0.5);
     return max(lol.r/scale, abs(pq.z)-0.8);
 }
 
@@ -165,12 +165,12 @@ void main () {
 
 #ifdef USE_AA
     gl_FragColor = (
-        getPixelColor(gl_FragCoord + vec2(0.0, 0.0)) +
-        getPixelColor(gl_FragCoord + vec2(0.5, 0.0)) +
-        getPixelColor(gl_FragCoord + vec2(0.0, 0.5)) +
-        getPixelColor(gl_FragCoord + vec2(0.5, 0.5))) * 0.25;
+        getPixelColor(gl_FragCoord.xy + vec2(0.0, 0.0)) +
+        getPixelColor(gl_FragCoord.xy + vec2(0.5, 0.0)) +
+        getPixelColor(gl_FragCoord.xy + vec2(0.0, 0.5)) +
+        getPixelColor(gl_FragCoord.xy + vec2(0.5, 0.5))) * 0.25;
 #else
     gl_FragColor = (
-        getPixelColor(gl_FragCoord + vec2(0.0, 0.0)));
+        getPixelColor(gl_FragCoord.xy + vec2(0.0, 0.0)));
 #endif
 }
