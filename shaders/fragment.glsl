@@ -13,13 +13,14 @@ uniform vec2 resolution;
 uniform sampler2D tex;
 uniform vec3 color;
 
-//#define USE_AA
+#define USE_AA
+#define USE_IMAGE
 
 #define DELTA           0.08
 #define NORMAL_DELTA     0.1
 #define RAY_COUNT       7
 #define RAY_LENGTH_MAX      100.0
-#define RAY_STEP_MAX        100
+#define RAY_STEP_MAX        80
 #define LIGHT           vec3 (1.0, 1.0, 1.0)
 #define REFRACT_FACTOR      0.6
 #define REFRACT_INDEX       1.4
@@ -63,10 +64,20 @@ float circle(in vec2 p, in vec2 o, in vec2 r)
 
 
 float getDistance (in vec3 p) {
-    vec3 ap = abs(p)-vec3(23.0, 6.5, 4.0);
+    vec3 ap = abs(p)-vec3(24.0, 7.5, 5.0);
     float extra = max(ap.x, max(ap.y, ap.z));
     if(extra > 0.0)
-        return extra + 2.0;
+        return extra + 3.0;
+
+#ifdef USE_IMAGE
+
+    float scale = 1.0/44.0;
+    vec3 p2 = p*scale;
+
+    vec4 lol = texture2D(tex, vec2(p2.x, -p2.y*4.0)+0.5);
+    return max(lol.r/scale, abs(p.z)-1.0);
+
+#else
 
     p += vec3(21.0, 4.5, 0.0);
     vec2 z = p.xy;
@@ -119,19 +130,8 @@ float getDistance (in vec3 p) {
 
     r = max(r, abs(p.z)-1.0);
     return r;
-}
 
-float getDistance2 (in vec3 pq) {
-    float scale = 0.06;
-    vec3 p = pq*scale;
-
-    vec3 ap = abs(p)-vec3(0.5, 0.125, 0.1);
-    float extra = max(ap.x, max(ap.y, ap.z));
-    if(extra > 0.0)
-        return extra/scale + 0.50;
-
-    vec4 lol = texture2D(tex, vec2(p.x, p.y*4.0)+0.5);
-    return max(lol.r/scale, abs(pq.z)-0.8);
+#endif
 }
 
 vec3 getFragmentColor (in vec3 origin, in vec3 direction) {
@@ -192,7 +192,7 @@ vec3 getFragmentColor (in vec3 origin, in vec3 direction) {
         vec3 refraction = refract (direction, normal, refractionRatio);
         if (dot (refraction, refraction) < DELTA) {
             direction = reflection;
-            origin += direction * DELTA * 2.0;
+            origin += direction * DELTA * 6.0;
         }
         else {
             direction = refraction;
