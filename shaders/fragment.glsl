@@ -16,8 +16,8 @@ uniform vec3 color;
 #define USE_AA
 #define USE_IMAGE
 
-#define DELTA           0.08
-#define NORMAL_DELTA     0.1
+#define DELTA           0.1
+#define NORMAL_DELTA     0.16
 #define RAY_COUNT       7
 #define RAY_LENGTH_MAX      100.0
 #define RAY_STEP_MAX        80
@@ -63,75 +63,92 @@ float circle(in vec2 p, in vec2 o, in vec2 r)
 }
 
 
-float getDistance (in vec3 p) {
-    vec3 ap = abs(p)-vec3(24.0, 7.5, 5.0);
-    float extra = max(ap.x, max(ap.y, ap.z));
+float getDistance2d (in vec2 p) {
+    vec2 ap = abs(p)-vec2(25.0, 22.0/4.0+3.0);
+    float extra = max(ap.x, ap.y);
     if(extra > 0.0)
         return extra + 3.0;
 
 #ifdef USE_IMAGE
 
+    //Calculate again with true image bounds
+    ap = abs(p)-vec2(22.0, 22.0/4.0);
+    extra = max(ap.x, ap.y);
+
     float scale = 1.0/44.0;
-    vec3 p2 = p*scale;
+    vec2 p2 = p*scale;
 
     vec4 lol = texture2D(tex, vec2(p2.x, -p2.y*4.0)+0.5);
-    return max(lol.r/scale, abs(p.z)-1.0);
+    return lol.r/scale + max(extra, 0.0);
 
 #else
 
-    p += vec3(21.0, 4.5, 0.0);
-    vec2 z = p.xy;
+    p += vec2(21.0, 4.5);
 
     float r = 100000.0;
 
     // V
-    r = min(r, box(z, vec2(0.0, 2.0), vec2(2.0, 9.0)));
-    r = min(r, box(z, vec2(4.0, 2.0), vec2(6.0, 9.0)));
-    r = min(r, box(z, vec2(1.0, 1.0), vec2(5.0, 2.0)));
-    r = min(r, box(z, vec2(2.0, 0.0), vec2(4.0, 2.0)));
-    r = min(r, box(z, vec2(1.0, 1.0), vec2(2.0, 3.0)));
-    r = min(r, box(z, vec2(4.0, 1.0), vec2(5.0, 3.0)));
+    r = min(r, box(p, vec2(0.0, 2.0), vec2(2.0, 9.0)));
+    r = min(r, box(p, vec2(4.0, 2.0), vec2(6.0, 9.0)));
+    r = min(r, box(p, vec2(1.0, 1.0), vec2(5.0, 2.0)));
+    r = min(r, box(p, vec2(2.0, 0.0), vec2(4.0, 2.0)));
+    r = min(r, box(p, vec2(1.0, 1.0), vec2(2.0, 3.0)));
+    r = min(r, box(p, vec2(4.0, 1.0), vec2(5.0, 3.0)));
 
     // G
-    r = min(r, box(z, vec2(8.0, 1.0), vec2(10.0, 8.0)));
-    r = min(r, box(z, vec2(9.0, 0.0), vec2(10.0, 9.0)));
-    r = min(r, box(z, vec2(9.0, 0.0), vec2(14.0, 1.0)));
-    r = min(r, box(z, vec2(12.0, 0.0), vec2(14.0, 4.0)));
-    r = min(r, box(z, vec2(11.0, 3.0), vec2(14.0, 4.0)));
-    r = min(r, box(z, vec2(9.0, 8.0), vec2(13.0, 9.0)));
-    r = min(r, box(z, vec2(12.0, 6.0), vec2(13.0, 9.0)));
-    r = min(r, box(z, vec2(12.0, 6.0), vec2(14.0, 8.0)));
+    r = min(r, box(p, vec2(8.0, 1.0), vec2(10.0, 8.0)));
+    r = min(r, box(p, vec2(9.0, 0.0), vec2(10.0, 9.0)));
+    r = min(r, box(p, vec2(9.0, 0.0), vec2(14.0, 1.0)));
+    r = min(r, box(p, vec2(12.0, 0.0), vec2(14.0, 4.0)));
+    r = min(r, box(p, vec2(11.0, 3.0), vec2(14.0, 4.0)));
+    r = min(r, box(p, vec2(9.0, 8.0), vec2(13.0, 9.0)));
+    r = min(r, box(p, vec2(12.0, 6.0), vec2(13.0, 9.0)));
+    r = min(r, box(p, vec2(12.0, 6.0), vec2(14.0, 8.0)));
 
     // A
-    r = min(r, box(z, vec2(16.0, 0.0), vec2(18.0, 7.0)));
-    r = min(r, box(z, vec2(17.0, 0.0), vec2(18.0, 8.0)));
-    r = min(r, box(z, vec2(20.0, 0.0), vec2(22.0, 7.0)));
-    r = min(r, box(z, vec2(20.0, 0.0), vec2(21.0, 8.0)));
-    r = min(r, box(z, vec2(17.0, 7.0), vec2(21.0, 8.0)));
-    r = min(r, box(z, vec2(18.0, 7.0), vec2(20.0, 9.0)));
-    r = min(r, box(z, vec2(17.0, 3.0), vec2(21.0, 4.0)));
+    r = min(r, box(p, vec2(16.0, 0.0), vec2(18.0, 7.0)));
+    r = min(r, box(p, vec2(17.0, 0.0), vec2(18.0, 8.0)));
+    r = min(r, box(p, vec2(20.0, 0.0), vec2(22.0, 7.0)));
+    r = min(r, box(p, vec2(20.0, 0.0), vec2(21.0, 8.0)));
+    r = min(r, box(p, vec2(17.0, 7.0), vec2(21.0, 8.0)));
+    r = min(r, box(p, vec2(18.0, 7.0), vec2(20.0, 9.0)));
+    r = min(r, box(p, vec2(17.0, 3.0), vec2(21.0, 4.0)));
 
     // F
-    r = min(r, box(z, vec2(24.0, 0.0), vec2(26.7, 9.0)));
-    r = min(r, box(z, vec2(24.0, 3.5), vec2(29.5, 5.4)));
-    r = min(r, box(z, vec2(24.0, 7.2), vec2(29.5, 9.0)));
+    r = min(r, box(p, vec2(24.0, 0.0), vec2(26.7, 9.0)));
+    r = min(r, box(p, vec2(24.0, 3.5), vec2(29.5, 5.4)));
+    r = min(r, box(p, vec2(24.0, 7.2), vec2(29.5, 9.0)));
 
     // I
-    r = min(r, box(z, vec2(30.9, 0.0), vec2(33.6, 9.0)));
+    r = min(r, box(p, vec2(30.9, 0.0), vec2(33.6, 9.0)));
 
     // B
-    r = min(r, box(z, vec2(35.0, 0.0), vec2(37.6, 9.0)));
-    r = min(r, box(z, vec2(35.0, 0.0), vec2(40.5, 1.8)));
-    r = min(r, box(z, vec2(35.0, 3.5), vec2(40.5, 5.4)));
-    r = min(r, box(z, vec2(35.0, 7.2), vec2(40.5, 9.0)));
-    r = min(r, box(z, vec2(39.0, 0.0), vec2(40.5, 9.0)));
-    r = min(r, circle(z, vec2(40.5, 2.25), vec2(1.5, 2.25)));
-    r = min(r, circle(z, vec2(40.5, 6.75), vec2(1.5, 2.25)));
+    r = min(r, box(p, vec2(35.0, 0.0), vec2(37.6, 9.0)));
+    r = min(r, box(p, vec2(35.0, 0.0), vec2(40.5, 1.8)));
+    r = min(r, box(p, vec2(35.0, 3.5), vec2(40.5, 5.4)));
+    r = min(r, box(p, vec2(35.0, 7.2), vec2(40.5, 9.0)));
+    r = min(r, box(p, vec2(39.0, 0.0), vec2(40.5, 9.0)));
+    r = min(r, circle(p, vec2(40.5, 2.25), vec2(1.5, 2.25)));
+    r = min(r, circle(p, vec2(40.5, 6.75), vec2(1.5, 2.25)));
 
-    r = max(r, abs(p.z)-1.0);
     return r;
 
 #endif
+}
+
+float getDistanceFast(in vec3 p, in vec3 dir) {
+    if(abs(p.z) > 1.0) {
+        float r = -sign(p.z)*(abs(p.z)-1.0)/dir.z;
+        if(r < 0.0)
+            return 10000.0;
+        else
+            return r;
+    }
+    return max(getDistance2d(p.xy), abs(p.z)-1.0);
+}
+
+float getDistance(in vec3 p) {
+    return max(getDistance2d(p.xy), abs(p.z)-1.0);
 }
 
 vec3 getFragmentColor (in vec3 origin, in vec3 direction) {
@@ -150,7 +167,11 @@ vec3 getFragmentColor (in vec3 origin, in vec3 direction) {
         float dist = RAY_LENGTH_MAX;
         float rayLength = 0.0;
         for (int rayStep = 0; rayStep < RAY_STEP_MAX; ++rayStep) {
-            dist = distanceFactor * getDistance (origin);
+            float oldDist = dist;
+            dist = distanceFactor * getDistanceFast(origin, direction);
+            //if(dist > oldDist && dist > 2.0)
+             //   break;
+
             float distMin = max (dist, DELTA);
             rayLength += distMin;
             if (dist < 0.0 || rayLength > RAY_LENGTH_MAX) {
