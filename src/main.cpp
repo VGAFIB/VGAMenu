@@ -9,6 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <sstream>
 #include <GL/gl.h>
 
 #include "sdf.h"
@@ -162,6 +163,10 @@ int main()
 	int destt = 0;
 	float allTime = 0;
 
+	float frameTime = 0;
+	float frameCount = 0;
+	float fps = 9999;
+
 	cout<<"Reading current game..."<<endl;
 	ifstream in("oldgame");
 	string currgame;
@@ -180,6 +185,7 @@ int main()
 
 	cout<<"Running..."<<endl;
 	Clock clock;
+
 	while(app.isOpen())
 	{
 		
@@ -227,7 +233,6 @@ int main()
 
 		app.clear();
 
-
 		if(true)
 		{
 			glBindTexture(GL_TEXTURE_2D, distfield);
@@ -252,6 +257,24 @@ int main()
 
 		for(int i = 0; i < (int)games.size(); i++)
 			games[i].render(i-t);
+
+		frameTime += deltaTime;
+		frameCount++;
+		if(frameTime > 2) {
+			fps = frameCount/frameTime;
+			frameCount = 0;
+			frameTime = 0;
+		}
+		sf::Text text;
+		text.setFont(font);
+		stringstream ss;
+		ss<<"FPS: "<<fps;
+		text.setString(ss.str());
+		text.setCharacterSize(30);
+		text.setColor(sf::Color::White);
+		text.setStyle(sf::Text::Bold);
+		text.setPosition(20, 20);
+		myapp->draw(text);
 
 
 		app.display();
