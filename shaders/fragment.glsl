@@ -13,7 +13,7 @@ uniform vec2 resolution;
 uniform sampler2D tex;
 uniform vec3 color;
 
-#define USE_AA
+//#define USE_AA
 #define USE_IMAGE
 
 #define DELTA		   0.1

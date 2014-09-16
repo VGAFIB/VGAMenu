@@ -23,12 +23,18 @@ using namespace std;
 RenderWindow* myapp;
 Font font;
 
+sf::String fromUtf8(std::string source) {
+  std::basic_string<sf::Uint32> tmp;
+  sf::Utf<8>::toUtf32( source.begin(), source.end(), std::back_inserter( tmp ) );
+  return tmp;
+}
+
 class Game
 {
 	public:
 		string name;
-		string title;
-		string description;
+		sf::String title;
+		sf::String description;
 		Texture t;
 		float r, g, b;
 
@@ -37,18 +43,23 @@ class Game
 			name = _name;
 
 			ifstream in (("./games/"+name+"/game.txt").c_str());
-			getline(in, title);
-			in>>r>>g>>b;
-
 			string line;
 			getline(in, line);
+			title = fromUtf8(line);
+			
+			in>>r>>g>>b;
 
+			getline(in, line);
+			
+			string desc;
 			while(getline(in, line)) {
 				//Ignorar lineas vacias al principio
 				if(description == "" && line == "")
 					continue;
-				description += line+"\n";
+				desc += line+"\n";
 			}
+			
+			description = fromUtf8(desc);
 
 			if(!t.loadFromFile("./games/"+name+"/game.png"))
 				cout<<"Cant load image for game "+name<<endl;
@@ -76,15 +87,15 @@ class Game
 			sf::Text text;
 			text.setFont(font);
 			text.setString(title);
-			text.setCharacterSize(30);
+			text.setCharacterSize(40);
 			text.setColor(sf::Color::White);
 			text.setStyle(sf::Text::Bold);
-			text.setPosition(x+50, y-20-100*dif);
+			text.setPosition(x+50, y-30-100*dif);
 			myapp->draw(text);
 
 			text.setStyle(0);
 			text.setCharacterSize(24);
-			text.setPosition(x+50, y+15-100*dif);
+			text.setPosition(x+50, y+25-100*dif);
 			text.setString(description);
 			text.setColor(sf::Color(255, 255, 255, 255*dif));
 			myapp->draw(text);
@@ -149,7 +160,7 @@ int main()
 	myapp = &app;
 
 	cout<<"Loading font..."<<endl;
-	if (!font.loadFromFile("data/BitDarling.ttf"))
+	if (!font.loadFromFile("data/font.ttf"))
 		cout<<"Can't load font!";
 
 	cout<<"Rendering distfield..."<<endl;
