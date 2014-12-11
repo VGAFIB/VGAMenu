@@ -156,8 +156,12 @@ int main()
 	loadGames();
 
 	cout<<"Creating window..."<<endl;
-	RenderWindow app(VideoMode(SCRWIDTH, SCRHEIGHT, 32), "Week1", Style::None);
+	RenderWindow app(VideoMode::getDesktopMode(), "Week1", Style::None);
 	myapp = &app;
+
+	sf::View view;
+	view.reset(sf::FloatRect(0, 0, SCRWIDTH, SCRHEIGHT));
+	app.setView(view);
 
 	cout<<"Loading font..."<<endl;
 	if (!font.loadFromFile("data/font.ttf"))
