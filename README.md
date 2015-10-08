@@ -1,7 +1,7 @@
 VGAMenu
 =======
 
-Menu de gaems
+Menu de games
 
 Configuracion
 ---------
