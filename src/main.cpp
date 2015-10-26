@@ -1,16 +1,16 @@
+#include <cmath>
+#include <queue>
+#include <vector>
+#include <cstdio>
+#include <cstdlib>
+#include <sstream>
+#include <fstream>
+#include <GL/gl.h>
+#include <dirent.h>
+#include <iostream>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
-#include <vector>
-#include <cstdlib>
-#include <cstdio>
-#include <queue>
-#include <dirent.h>
-#include <iostream>
-#include <fstream>
-#include <cmath>
-#include <sstream>
-#include <GL/gl.h>
 
 #include "sdf.h"
 
@@ -32,10 +32,10 @@ sf::String fromUtf8(std::string source) {
 class Game
 {
 	public:
+		Texture t;
 		string name;
 		sf::String title;
 		sf::String description;
-		Texture t;
 		float r, g, b;
 
 		void load(string _name)
@@ -62,7 +62,7 @@ class Game
 			description = fromUtf8(desc);
 
 			if(!t.loadFromFile("./games/"+name+"/game.png"))
-				cout<<"Cant load image for game "+name<<endl;
+				cerr<<"#####Cant load image for game "+name<<endl;
 		}
 
 		void render(float p)
@@ -122,7 +122,7 @@ void loadGames()
 		closedir (dir);
 	} else {
 		/* could not open directory */
-		cout<<"Could not open games/ dir"<<endl;
+		cerr<<"#####Could not open games/ dir line 125"<<endl;
 	}
 }
 
@@ -165,14 +165,15 @@ int main()
 
 	cout<<"Loading font..."<<endl;
 	if (!font.loadFromFile("data/font.ttf"))
-		cout<<"Can't load font!";
+		cerr<<"#####Can't load font! line 168";
 
 	cout<<"Rendering distfield..."<<endl;
 	GLuint distfield = makeDistanceField();
 
 	cout<<"Loading shader..."<<endl;
 	Shader* shader = new Shader();
-	shader->loadFromFile("shaders/vertex.glsl", "shaders/fragment.glsl");
+	if(!shader->loadFromFile("shaders/vertex.glsl", "shaders/fragment.glsl"))
+		cerr<<"##### Can't load Shader  line 176" <<endl; 
 
 	float t = 0;
 	int destt = 0;
